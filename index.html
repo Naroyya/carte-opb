@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portail Cartographique - Oullins-Pierre-Bénite</title>
+
+  <!-- MapLibre GL CSS -->
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0f172a;
+      color: #334155;
+    }
+
+    #split-container {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      width: 100vw;
+      background-color: #f1f5f9;
+    }
+
+    .split {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Sidebar Styling */
+    #sidebar {
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #e2e8f0;
+      z-index: 10;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+    }
+
+    .sidebar-header {
+      padding: 18px 16px;
+      background: #0f172a;
+      color: #ffffff;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .sidebar-header h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-header p {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .sidebar-content {
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 12px;
+      margin-top: 4px;
+    }
+
+    .layer-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .layer-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .layer-item:hover {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .layer-item.panoramax-item {
+      background-color: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+
+    .layer-item.panoramax-item:hover {
+      background-color: #dcfce7;
+      border-color: #86efac;
+    }
+
+    .layer-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #2563eb;
+      cursor: pointer;
+    }
+
+    .layer-item.panoramax-item input[type="checkbox"] {
+      accent-color: #16a34a;
+    }
+
+    .layer-label {
+      margin-left: 10px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .layer-badge {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .badge-pmr { background-color: #2563eb; }
+    .badge-arbres { background-color: #16a34a; }
+    .badge-cameras { background-color: #dc2626; }
+    .badge-livraison { background-color: #d97706; }
+    .badge-panoramax { background-color: #10b981; }
+
+    .instructions-card {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.8rem;
+      color: #1e40af;
+      line-height: 1.45;
+    }
+
+    .instructions-card i {
+      margin-right: 6px;
+    }
+
+    /* Map Panel */
+    #map {
+      background-color: #e2e8f0;
+      position: relative;
+    }
+
+    /* Panoramax Panel */
+    #panoramax-container {
+      background-color: #0f172a;
+      display: none;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 30;
+      width: 34px;
+      height: 34px;
+      background-color: rgba(15, 23, 42, 0.85);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      backdrop-filter: blur(4px);
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+    }
+
+    .close-btn:hover {
+      background-color: #dc2626;
+      border-color: #dc2626;
+      transform: scale(1.08);
+    }
+
+    #panoramax-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .panoramax-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #64748b;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .panoramax-placeholder i {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      color: #10b981;
+    }
+
+    /* Splitters */
+    .gutter {
+      background-color: #cbd5e1;
+      background-repeat: no-repeat;
+      background-position: 50%;
+      cursor: col-resize;
+      transition: background-color 0.2s;
+      z-index: 20;
+    }
+
+    .gutter:hover, .gutter:active {
+      background-color: #2563eb;
+    }
+
+    .gutter.gutter-horizontal {
+      width: 6px;
+    }
+
+    /* Popup Styling */
+    .maplibregl-popup-content {
+      padding: 14px 16px;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      font-family: inherit;
+    }
+
+    .popup-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .popup-detail {
+      font-size: 0.82rem;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="split-container">
+    
+    <!-- Left Sidebar -->
+    <div id="sidebar" class="split">
+      <div class="sidebar-header">
+        <h1><i class="fa-solid fa-map-location-dot"></i> Oullins-Pierre-Bénite</h1>
+        <p>Portail Cartographique Communal</p>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="section-title">Jeux de données communaux</div>
+        
+        <div class="layer-group">
+          <label class="layer-item">
+            <input type="checkbox" id="layer-pmr" checked>
+            <span class="layer-label">
+              <span class="layer-badge badge-pmr"></span>
+              Places PMR
+            </span>
+          </label>
+
+          <label class="layer-item">
+            <input type="checkbox" id="layer-livraison">
+            <span class="layer-label">
+              <span class="layer-badge badge-livraison"></span>
+              Places de livraison
+            </span>
+          </label>
+        </div>
+
+        <div class="section-title">Imagerie Immersive</div>
+        <div class="layer-group">
+          <label class="layer-item panoramax-item">
+            <input type="checkbox" id="toggle-panoramax">
+            <span class="layer-label">
+              <span class="layer-badge badge-panoramax"></span>
+              Vue Panoramax 360°
+            </span>
+          </label>
+        </div>
+
+        <div class="instructions-card" id="instructions-text">
+          <p><i class="fa-solid fa-circle-info"></i> <strong>Information :</strong> Cliquez sur un objet (PMR, arbre...) pour ouvrir sa fiche descriptive.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Map Panel -->
+    <div id="map" class="split"></div>
+
+    <!-- Right Panoramax Viewer Panel -->
+    <div id="panoramax-container" class="split">
+      <button id="close-panoramax" class="close-btn" title="Fermer Panoramax (×)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div id="panoramax-content" style="width: 100%; height: 100%;">
+        <div class="panoramax-placeholder">
+          <i class="fa-solid fa-street-view"></i>
+          <p>Cliquez sur la carte pour charger la vue 360°.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- External Libraries -->
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/split.js/dist/split.min.js"></script>
+
+  <script>
+    
+    // Oullins-Pierre-Bénite coordinates
+    const OULLINS_PIERRE_BENITE_CENTER = [4.8080, 45.7140];
+    const DEFAULT_ZOOM = 14;
+
+    let splitInstance = null;
+    let isPanoramaxOpen = false;
+    let isPanoramaxModeActive = false;
+
+    // Layout configuration: 2 Panels (Sidebar + Map)
+    function initSplitTwoPanels() {
+      if (splitInstance) splitInstance.destroy();
+      document.getElementById('panoramax-container').style.display = 'none';
+
+      splitInstance = Split(['#sidebar', '#map'], {
+        sizes: [22, 78],
+        minSize: [200, 300],
+        gutterSize: 6,
+        onDrag: () => { if (map) map.resize(); }
+      });
+      if (map) map.resize();
+    }
+
+    // Layout configuration: 3 Panels (Sidebar + Map + Panoramax)
+    function openPanoramaxPanel() {
+      if (!isPanoramaxOpen) {
+        if (splitInstance) splitInstance.destroy();
+        document.getElementById('panoramax-container').style.display = 'flex';
+
+        splitInstance = Split(['#sidebar', '#map', '#panoramax-container'], {
+          sizes: [20, 48, 32],
+          minSize: [180, 250, 250],
+          gutterSize: 6,
+          onDrag: () => { if (map) map.resize(); }
+        });
+
+        isPanoramaxOpen = true;
+      }
+      if (map) map.resize();
+    }
+
+    // Close Panoramax panel
+    function closePanoramaxPanel() {
+      if (splitInstance) splitInstance.destroy();
+      document.getElementById('panoramax-container').style.display = 'none';
+
+      splitInstance = Split(['#sidebar', '#map'], {
+        sizes: [22, 78],
+        minSize: [200, 300],
+        gutterSize: 6,
+        onDrag: () => { if (map) map.resize(); }
+      });
+
+      isPanoramaxOpen = false;
+      isPanoramaxModeActive = false;
+
+      // Uncheck sidebar toggle
+      const panToggle = document.getElementById('toggle-panoramax');
+      if (panToggle) panToggle.checked = false;
+
+      // Reset instructions
+      document.getElementById('instructions-text').innerHTML = `
+        <p><i class="fa-solid fa-circle-info"></i> <strong>Information :</strong> Cliquez sur un objet pour afficher sa fiche d'information.</p>
+      `;
+
+      // Reset viewer placeholder
+      document.getElementById('panoramax-content').innerHTML = `
+        <div class="panoramax-placeholder">
+          <i class="fa-solid fa-street-view"></i>
+          <p>Cliquez sur la carte pour charger la vue 360°.</p>
+        </div>
+      `;
+
+      if (map) map.resize();
+    }
+
+    // Initialize MapLibre GL Map with Plan IGN V2
+    const map = new maplibregl.Map({
+      container: 'map',
+		style: {
+			'version': 8,
+			'sources': {
+			  'fond-quaidorsay': {
+				'type': 'raster',
+				'tiles': [
+				  'https://a.forte.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png',
+				  'https://b.forte.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png'
+				],
+				'tileSize': 256,
+				'attribution': '&copy; Ministère de l\'Europe et des Affaires étrangères'
+			  }
+			},
+'layers': [
+      {
+        'id': 'quaidorsay-layer',
+        'type': 'raster',
+        'source': 'fond-quaidorsay',
+        'minzoom': 0,
+        'maxzoom': 19
+      }
+    ]
+  },
+  center: [4.8080, 45.7140], // Oullins-Pierre-Bénite
+  zoom: 14
+});
+
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+
+    const mockLivraison = {
+      "type": "FeatureCollection",
+      "features": [
+        { "type": "Feature", "geometry": { "type": "Point", "coordinates": [4.8070, 45.7148] }, "properties": { "horaires": "07h00 - 12h00", "type": "Poids lourd" } },
+        { "type": "Feature", "geometry": { "type": "Point", "coordinates": [4.8130, 45.7035] }, "properties": { "horaires": "24h/24", "type": "Véhicule léger" } }
+      ]
+    };
+
+    map.on('load', () => {
+
+      // Add Data Layers
+      map.addSource('src-pmr', { type: 'geojson', data: './places_pmr.geojson' });
+      map.addLayer({
+        id: 'layer-pmr',
+        type: 'circle',
+        source: 'src-pmr',
+        paint: {
+          'circle-radius': 7,
+          'circle-color': '#2563eb',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+
+      map.addSource('src-livraison', { type: 'geojson', data: mockLivraison });
+      map.addLayer({
+        id: 'layer-livraison',
+        type: 'circle',
+        source: 'src-livraison',
+        layout: { 'visibility': 'none' },
+        paint: {
+          'circle-radius': 7,
+          'circle-color': '#d97706',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+
+      setupLayerToggle('layer-pmr');
+      setupLayerToggle('layer-livraison');
+    });
+
+    function setupLayerToggle(layerId) {
+      const checkbox = document.getElementById(layerId);
+      if (checkbox) {
+        checkbox.addEventListener('change', (e) => {
+          map.setLayoutProperty(layerId, 'visibility', e.target.checked ? 'visible' : 'none');
+        });
+      }
+    }
+
+    // Toggle Panoramax mode on/off
+    document.getElementById('toggle-panoramax').addEventListener('change', (e) => {
+      isPanoramaxModeActive = e.target.checked;
+      const infoBox = document.getElementById('instructions-text');
+
+      if (isPanoramaxModeActive) {
+        infoBox.innerHTML = `
+          <p><i class="fa-solid fa-camera-retro"></i> <strong>Mode Panoramax actif :</strong> Cliquez n'importe où sur la carte pour charger la vue 360° correspondante.</p>
+        `;
+      } else {
+        closePanoramaxPanel();
+      }
+    });
+
+    // Unified Click Handler
+    map.on('click', (e) => {
+      // MODE 1: Panoramax active -> Open Panoramax Viewer
+      if (isPanoramaxModeActive) {
+        const lng = e.lngLat.lng;
+        const lat = e.lngLat.lat;
+
+        openPanoramaxPanel();
+
+        const panoramaxUrl = `https://explore.panoramax.fr/#map=18/${lat}/${lng}`;
+        const container = document.getElementById('panoramax-content');
+        container.innerHTML = `
+          <iframe 
+            id="panoramax-frame"
+            src="${panoramaxUrl}" 
+            allow="geolocation"
+            title="Vue Panoramax 360°">
+          </iframe>
+        `;
+      } 
+      // MODE 2: Standard mode -> Display GeoJSON attribute Popups
+      else {
+        const bbox = [[e.point.x - 5, e.point.y - 5], [e.point.x + 5, e.point.y + 5]];
+        const features = map.queryRenderedFeatures(bbox, {
+          layers: ['layer-pmr', 'layer-arbres', 'layer-cameras', 'layer-livraison']
+        });
+
+        if (features.length > 0) {
+          const feature = features[0];
+          const props = feature.properties;
+          let content = '';
+
+          if (feature.layer.id === 'layer-pmr') {
+            content = `<div class="popup-title"><i class="fa-solid fa-wheelchair" style="color:#2563eb"></i> ${props.nom}</div>
+                       <div class="popup-detail"><strong>Adresse :</strong> ${props.adresse}</div>
+                       <div class="popup-detail"><strong>Tarification :</strong> ${props.statut}</div>`;
+          } else if (feature.layer.id === 'layer-livraison') {
+            content = `<div class="popup-title"><i class="fa-solid fa-truck-ramp-box" style="color:#d97706"></i> Aire de livraison</div>
+                       <div class="popup-detail"><strong>Plage horaire :</strong> ${props.horaires}</div>`;
+          }
+
+          new maplibregl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(content)
+            .addTo(map);
+        }
+      }
+    });
+
+    // Cursor feedback on hoverable features
+    map.on('mousemove', (e) => {
+      if (!isPanoramaxModeActive) {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['layer-pmr', 'layer-arbres', 'layer-cameras', 'layer-livraison']
+        });
+        map.getCanvas().style.cursor = features.length ? 'pointer' : '';
+      } else {
+        map.getCanvas().style.cursor = 'crosshair';
+      }
+    });
+
+    // Close button click listener
+    document.getElementById('close-panoramax').addEventListener('click', () => {
+      closePanoramaxPanel();
+    });
+
+    // Start in 2-panel mode
+    window.addEventListener('DOMContentLoaded', () => {
+      initSplitTwoPanels();
+    });
+
+  </script>
+</body>
+</html>
