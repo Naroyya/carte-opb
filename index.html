@@ -541,7 +541,7 @@
         `;
       } 
       // MODE 2: Standard mode -> Display GeoJSON attribute Popups
-      else {
+	else {
         const bbox = [[e.point.x - 5, e.point.y - 5], [e.point.x + 5, e.point.y + 5]];
         const features = map.queryRenderedFeatures(bbox, {
           layers: ['layer-pmr', 'layer-arbres', 'layer-cameras', 'layer-livraison']
@@ -577,6 +577,7 @@
             .setHTML(content)
             .addTo(map);
         }
+      }
       }
     });
 
