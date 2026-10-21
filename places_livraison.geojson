@@ -1,0 +1,603 @@
+{
+  "type": "FeatureCollection",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 1,
+        "Adresse": "73-75 boulevard Emile Zola",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 3,
+        "Metres": "15",
+        "Total": 51,
+        "Heures": "7h-20h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.79925,
+          45.71986111111111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 2,
+        "Adresse": "91 boulevard Emile Zola",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 3,
+        "Metres": "15",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.80225,
+          45.71963888888889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 3,
+        "Adresse": "76 boulevard Emile Zola",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 4,
+        "Metres": "20",
+        "Heures": "4h-19h",
+        "Stationnement": "oui",
+        "Arrêt": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.803361111111111,
+          45.71961111111111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 4,
+        "Adresse": "14 boulevard Emile Zola",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 3,
+        "Metres": "15",
+        "Heures": "7h-20h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.804666666666667,
+          45.719555555555555
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 5,
+        "Adresse": "4 boulevard du Général de Gaulle",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Stationnement": "oui",
+        "Unnamed: 18": "3,5 tonnes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.790666666666667,
+          45.71852777777778
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 6,
+        "Adresse": "42 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui",
+        "Unnamed: 18": "3,5 tonnes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.807833333333333,
+          45.71588888888889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 7,
+        "Adresse": "18 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 3,
+        "Metres": "15",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui",
+        "Unnamed: 18": "3,5 tonnes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.808083333333333,
+          45.71661111111111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 8,
+        "Adresse": "25 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui",
+        "Unnamed: 18": "3,5 tonnes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.808166666666667,
+          45.71658333333333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 9,
+        "Adresse": "86 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui",
+        "Unnamed: 18": "3,5 tonnes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.807388888888889,
+          45.714583333333335
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 10,
+        "Adresse": "93 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.807166666666667,
+          45.714333333333336
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 11,
+        "Adresse": "98 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.807,
+          45.71413888888889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 12,
+        "Adresse": "103 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.806666666666667,
+          45.71380555555555
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 13,
+        "Adresse": "128 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 1,
+        "Metres": "5",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.805888888888889,
+          45.713
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 14,
+        "Adresse": "131 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.8055,
+          45.71261111111111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 15,
+        "Adresse": "146 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.804972222222222,
+          45.71211111111111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 16,
+        "Adresse": "181 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.803888888888889,
+          45.71088888888889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 17,
+        "Adresse": "194 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.803361111111111,
+          45.71038888888889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 18,
+        "Adresse": "185 grande rue",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 1,
+        "Metres": "5",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.803611111111111,
+          45.710666666666666
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 19,
+        "Adresse": "7 place Anatole France",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.805111111111111,
+          45.71438888888889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 20,
+        "Adresse": "29 rue de la Cité",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 1,
+        "Metres": "5",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.803888888888889,
+          45.71452777777778
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 21,
+        "Adresse": "11 rue Lortet",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 1,
+        "Metres": "5",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.80375,
+          45.71505555555555
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 22,
+        "Adresse": "18 rue Diderot",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.805388888888889,
+          45.71577777777778
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 23,
+        "Adresse": "11 rue Diderot",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.805555555555555,
+          45.71577777777778
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 24,
+        "Adresse": "38 rue Diderot",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.804138888888889,
+          45.71616666666667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 25,
+        "Adresse": "4 place la République",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 2,
+        "Metres": "10",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.808027777777778,
+          45.70277777777778
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 26,
+        "Adresse": "25 rue de la République",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 1,
+        "Metres": "5",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.807888888888889,
+          45.70322222222222
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 27,
+        "Adresse": "109 rue de la République",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 1,
+        "Metres": "5",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.805277777777778,
+          45.70822222222222
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 28,
+        "Adresse": "8 boulevard de l'Europe",
+        "Code_Postal": 69600,
+        "Commune": "OULLINS-PIERRE-BENITE",
+        "Nb_Places": 1,
+        "Metres": "5",
+        "Heures": "7h-19h",
+        "Stationnement": "oui",
+        "Mise en Fourrière": "oui"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.810944444444445,
+          45.70519444444445
+        ]
+      }
+    }
+  ]
+}
