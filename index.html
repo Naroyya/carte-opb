@@ -153,8 +153,6 @@
     }
 
     .badge-pmr { background-color: #2563eb; }
-    .badge-arbres { background-color: #16a34a; }
-    .badge-cameras { background-color: #dc2626; }
     .badge-livraison { background-color: #d97706; }
     .badge-panoramax { background-color: #10b981; }
 
@@ -266,12 +264,13 @@
       font-weight: 700;
       font-size: 0.95rem;
       color: #0f172a;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .popup-detail {
       font-size: 0.82rem;
       color: #64748b;
+      margin-top: 2px;
     }
   </style>
 </head>
@@ -319,7 +318,7 @@
         </div>
 
         <div class="instructions-card" id="instructions-text">
-          <p><i class="fa-solid fa-circle-info"></i> <strong>Information :</strong> Cliquez sur un objet (PMR, arbre...) pour ouvrir sa fiche descriptive.</p>
+          <p><i class="fa-solid fa-circle-info"></i> <strong>Information :</strong> Cliquez sur un objet pour ouvrir sa fiche descriptive.</p>
         </div>
       </div>
     </div>
@@ -423,35 +422,35 @@
       if (map) map.resize();
     }
 
-    // Initialize MapLibre GL Map with Plan IGN V2
+    // Initialize MapLibre GL Map
     const map = new maplibregl.Map({
       container: 'map',
-		style: {
-			'version': 8,
-			'sources': {
-			  'fond-quaidorsay': {
-				'type': 'raster',
-				'tiles': [
-				  'https://a.forte.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png',
-				  'https://b.forte.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png'
-				],
-				'tileSize': 256,
-				'attribution': '&copy; Ministère de l\'Europe et des Affaires étrangères'
-			  }
-			},
-'layers': [
-      {
-        'id': 'quaidorsay-layer',
-        'type': 'raster',
-        'source': 'fond-quaidorsay',
-        'minzoom': 0,
-        'maxzoom': 19
-      }
-    ]
-  },
-  center: [4.8080, 45.7140], // Oullins-Pierre-Bénite
-  zoom: 14
-});
+      style: {
+        'version': 8,
+        'sources': {
+          'fond-quaidorsay': {
+            'type': 'raster',
+            'tiles': [
+              'https://a.forte.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png',
+              'https://b.forte.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png'
+            ],
+            'tileSize': 256,
+            'attribution': '&copy; Ministère de l\'Europe et des Affaires étrangères'
+          }
+        },
+        'layers': [
+          {
+            'id': 'quaidorsay-layer',
+            'type': 'raster',
+            'source': 'fond-quaidorsay',
+            'minzoom': 0,
+            'maxzoom': 19
+          }
+        ]
+      },
+      center: OULLINS_PIERRE_BENITE_CENTER,
+      zoom: DEFAULT_ZOOM
+    });
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 
@@ -464,8 +463,7 @@
     };
 
     map.on('load', () => {
-
-      // Add Data Layers
+      // Add PMR Layer from GeoJSON file
       map.addSource('src-pmr', { type: 'geojson', data: './places_pmr.geojson' });
       map.addLayer({
         id: 'layer-pmr',
@@ -479,6 +477,7 @@
         }
       });
 
+      // Add Livraison Layer
       map.addSource('src-livraison', { type: 'geojson', data: mockLivraison });
       map.addLayer({
         id: 'layer-livraison',
@@ -541,10 +540,10 @@
         `;
       } 
       // MODE 2: Standard mode -> Display GeoJSON attribute Popups
-	else {
+      else {
         const bbox = [[e.point.x - 5, e.point.y - 5], [e.point.x + 5, e.point.y + 5]];
         const features = map.queryRenderedFeatures(bbox, {
-          layers: ['layer-pmr', 'layer-arbres', 'layer-cameras', 'layer-livraison']
+          layers: ['layer-pmr', 'layer-livraison']
         });
 
         if (features.length > 0) {
@@ -559,7 +558,7 @@
               </div>
               <div class="popup-detail"><strong>Adresse :</strong> ${props["Adresse"] || 'Non renseignée'}</div>
               <div class="popup-detail"><strong>Nombre de places :</strong> ${props["Nb Places"] || 1}</div>
-              <div class="popup-detail"><strong>Commune :</strong> ${props["COMMUNE"] || 'Oullins-Pierre-Bénite'}</div>
+              <div class="popup-detail"><strong>Commune :</strong> ${props["COMMUNE"] || 'OULLINS-PIERRE-BENITE'}</div>
               <div class="popup-detail"><strong>Signalisation (SVA) :</strong> ${props["SVA"] || 'N/A'}</div>
               <div class="popup-detail"><strong>Panonceau Fourrière :</strong> ${props["Panonceau Fourrière"] || 'Non'}</div>
             `;
@@ -578,14 +577,13 @@
             .addTo(map);
         }
       }
-      }
     });
 
     // Cursor feedback on hoverable features
     map.on('mousemove', (e) => {
       if (!isPanoramaxModeActive) {
         const features = map.queryRenderedFeatures(e.point, {
-          layers: ['layer-pmr', 'layer-arbres', 'layer-cameras', 'layer-livraison']
+          layers: ['layer-pmr', 'layer-livraison']
         });
         map.getCanvas().style.cursor = features.length ? 'pointer' : '';
       } else {
