@@ -553,12 +553,23 @@
           let content = '';
 
           if (feature.layer.id === 'layer-pmr') {
-            content = `<div class="popup-title"><i class="fa-solid fa-wheelchair" style="color:#2563eb"></i> ${props.nom}</div>
-                       <div class="popup-detail"><strong>Adresse :</strong> ${props.adresse}</div>
-                       <div class="popup-detail"><strong>Tarification :</strong> ${props.statut}</div>`;
+            content = `
+              <div class="popup-title">
+                <i class="fa-solid fa-wheelchair" style="color:#2563eb"></i> Place PMR
+              </div>
+              <div class="popup-detail"><strong>Adresse :</strong> ${props["Adresse"] || 'Non renseignée'}</div>
+              <div class="popup-detail"><strong>Nombre de places :</strong> ${props["Nb Places"] || 1}</div>
+              <div class="popup-detail"><strong>Commune :</strong> ${props["COMMUNE"] || 'Oullins-Pierre-Bénite'}</div>
+              <div class="popup-detail"><strong>Signalisation (SVA) :</strong> ${props["SVA"] || 'N/A'}</div>
+              <div class="popup-detail"><strong>Panonceau Fourrière :</strong> ${props["Panonceau Fourrière"] || 'Non'}</div>
+            `;
           } else if (feature.layer.id === 'layer-livraison') {
-            content = `<div class="popup-title"><i class="fa-solid fa-truck-ramp-box" style="color:#d97706"></i> Aire de livraison</div>
-                       <div class="popup-detail"><strong>Plage horaire :</strong> ${props.horaires}</div>`;
+            content = `
+              <div class="popup-title">
+                <i class="fa-solid fa-truck-ramp-box" style="color:#d97706"></i> Aire de livraison
+              </div>
+              <div class="popup-detail"><strong>Plage horaire :</strong> ${props.horaires || 'N/A'}</div>
+            `;
           }
 
           new maplibregl.Popup()
