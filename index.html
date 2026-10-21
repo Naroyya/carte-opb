@@ -290,7 +290,7 @@
         
         <div class="layer-group">
           <label class="layer-item">
-            <input type="checkbox" id="layer-pmr" checked>
+            <input type="checkbox" id="layer-pmr">
             <span class="layer-label">
               <span class="layer-badge badge-pmr"></span>
               Places PMR
@@ -318,7 +318,7 @@
         </div>
 
         <div class="instructions-card" id="instructions-text">
-          <p><i class="fa-solid fa-circle-info"></i> <strong>Information :</strong> Cliquez sur un objet pour ouvrir sa fiche descriptive.</p>
+          <p><i class="fa-solid fa-circle-info"></i> <strong>Information :</strong> Cochez une couche puis cliquez sur un objet pour afficher sa fiche d'information.</p>
         </div>
       </div>
     </div>
@@ -408,7 +408,7 @@
 
       // Reset instructions
       document.getElementById('instructions-text').innerHTML = `
-        <p><i class="fa-solid fa-circle-info"></i> <strong>Information :</strong> Cliquez sur un objet pour afficher sa fiche d'information.</p>
+        <p><i class="fa-solid fa-circle-info"></i> <strong>Information :</strong> Cochez une couche puis cliquez sur un objet pour afficher sa fiche d'information.</p>
       `;
 
       // Reset viewer placeholder
@@ -454,21 +454,14 @@
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 
-    const mockLivraison = {
-      "type": "FeatureCollection",
-      "features": [
-        { "type": "Feature", "geometry": { "type": "Point", "coordinates": [4.8070, 45.7148] }, "properties": { "horaires": "07h00 - 12h00", "type": "Poids lourd" } },
-        { "type": "Feature", "geometry": { "type": "Point", "coordinates": [4.8130, 45.7035] }, "properties": { "horaires": "24h/24", "type": "Véhicule léger" } }
-      ]
-    };
-
     map.on('load', () => {
-      // Add PMR Layer from GeoJSON file
+      // Add PMR Layer (Hidden by default)
       map.addSource('src-pmr', { type: 'geojson', data: './places_pmr.geojson' });
       map.addLayer({
         id: 'layer-pmr',
         type: 'circle',
         source: 'src-pmr',
+        layout: { 'visibility': 'none' },
         paint: {
           'circle-radius': 7,
           'circle-color': '#2563eb',
@@ -477,8 +470,8 @@
         }
       });
 
-      // Add Livraison Layer
-      map.addSource('src-livraison', { type: 'geojson', data: mockLivraison });
+      // Add Livraison Layer (Hidden by default)
+      map.addSource('src-livraison', { type: 'geojson', data: './places_livraison.geojson' });
       map.addLayer({
         id: 'layer-livraison',
         type: 'circle',
@@ -499,6 +492,8 @@
     function setupLayerToggle(layerId) {
       const checkbox = document.getElementById(layerId);
       if (checkbox) {
+        // Ensure state starts unchecked
+        checkbox.checked = false;
         checkbox.addEventListener('change', (e) => {
           map.setLayoutProperty(layerId, 'visibility', e.target.checked ? 'visible' : 'none');
         });
@@ -567,7 +562,11 @@
               <div class="popup-title">
                 <i class="fa-solid fa-truck-ramp-box" style="color:#d97706"></i> Aire de livraison
               </div>
-              <div class="popup-detail"><strong>Plage horaire :</strong> ${props.horaires || 'N/A'}</div>
+              <div class="popup-detail"><strong>Adresse :</strong> ${props["Adresse"] || 'Non renseignée'}</div>
+              <div class="popup-detail"><strong>Nombre de places :</strong> ${props["Nb_Places"] || 'N/A'}</div>
+              <div class="popup-detail"><strong>Horaires :</strong> ${props["Heures"] || 'Non renseignés'}</div>
+              <div class="popup-detail"><strong>Stationnement :</strong> ${props["Stationnement"] || 'N/A'}</div>
+              <div class="popup-detail"><strong>Mise en fourrière :</strong> ${props["Mise en Fourrière"] || 'Non'}</div>
             `;
           }
 
