@@ -289,6 +289,22 @@
         <div class="section-title">Jeux de données communaux</div>
         
         <div class="layer-group">
+		<label class="layer-item">
+    <input type="checkbox" id="toggle-ortho">
+    <span class="layer-label">
+      <span class="layer-badge" style="background-color: #8b5cf6;"></span>
+      Orthophoto IGN Récente
+    </span>
+  </label>
+  
+  <!-- Curseur d'opacité -->
+  <div id="ortho-opacity-container" style="display: none; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 4px;">
+    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #475569; margin-bottom: 4px;">
+      <span>Opacité :</span>
+      <strong id="ortho-opacity-val">70%</strong>
+    </div>
+    <input type="range" id="ortho-opacity-slider" min="0" max="100" value="70" style="width: 100%; cursor: pointer; accent-color: #8b5cf6;">
+  </div>
           <label class="layer-item">
             <input type="checkbox" id="layer-pmr">
             <span class="layer-label">
@@ -454,10 +470,33 @@
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 
-    map.on('load', () => {
-      // Add PMR Layer (Hidden by default)
-      map.addSource('src-pmr', { type: 'geojson', data: './places_pmr.geojson' });
-      map.addLayer({
+    map.on('load', () => 
+	{
+      // 1. Source WMTS Orthophoto Haute Résolution (IGN / Géoplateforme)
+		map.addSource('src-ortho', 
+		{
+			'type': 'raster',
+			'tiles': [
+				'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
+			],
+			'tileSize': 256,
+			'attribution': '&copy; <a href="https://www.geoportail.gouv.fr/" target="_blank">IGN / Géoplateforme</a>'
+		}
+		);
+
+		// 2. Ajout du calque Orthophoto (Placé sous les couches PMR / Livraison)
+		map.addLayer({
+			'id': 'layer-ortho',
+			'type': 'raster',
+			'source': 'src-ortho',
+			'layout': { 'visibility': 'none' }, // Masqué par défaut
+			'paint': {
+				'raster-opacity': 0.7 // Opacité initiale 70%
+			}
+		}, 'layer-pmr'); // Se place sous layer-pmr si la couche existe déjà
+		// Add PMR Layer (Hidden by default)
+		map.addSource('src-pmr', { type: 'geojson', data: './places_pmr.geojson' });
+		map.addLayer({
         id: 'layer-pmr',
         type: 'circle',
         source: 'src-pmr',
@@ -488,6 +527,40 @@
       setupLayerToggle('layer-pmr');
       setupLayerToggle('layer-livraison');
     });
+
+	const orthoCheckbox = document.getElementById('toggle-ortho');
+    const opacityContainer = document.getElementById('ortho-opacity-container');
+    const opacitySlider = document.getElementById('ortho-opacity-slider');
+    const opacityValueText = document.getElementById('ortho-opacity-val');
+
+    if (orthoCheckbox) {
+      orthoCheckbox.checked = false;
+
+      orthoCheckbox.addEventListener('change', (e) => {
+        const isChecked = e.target.checked;
+        
+        // Afficher/Masquer l'orthophoto sur la carte
+        map.setLayoutProperty('layer-ortho', 'visibility', isChecked ? 'visible' : 'none');
+        
+        // Afficher/Masquer le slider d'opacité dans la sidebar
+        if (opacityContainer) {
+          opacityContainer.style.display = isChecked ? 'block' : 'none';
+        }
+      });
+    }
+
+    if (opacitySlider) {
+      opacitySlider.addEventListener('input', (e) => {
+        const opacityVal = parseInt(e.target.value, 10);
+        const opacityDecimal = opacityVal / 100;
+
+        if (opacityValueText) {
+          opacityValueText.textContent = `${opacityVal}%`;
+        }
+
+        map.setPaintProperty('layer-ortho', 'raster-opacity', opacityDecimal);
+      });
+    }
 
     function setupLayerToggle(layerId) {
       const checkbox = document.getElementById(layerId);
