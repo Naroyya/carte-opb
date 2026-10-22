@@ -277,6 +277,37 @@
       color: #64748b;
       margin-top: 2px;
     }
+
+    /* Adaptation Mobile (écrans <= 768px) */
+    @media (max-width: 768px) {
+      #split-container {
+        flex-direction: column !important;
+      }
+
+      .gutter.gutter-horizontal {
+        display: none !important;
+      }
+
+      #sidebar {
+        width: 100% !important;
+        max-height: 40vh;
+        overflow-y: auto;
+      }
+
+      #map {
+        width: 100% !important;
+        height: 60vh !important;
+      }
+
+      .maplibregl-popup-content {
+        font-size: 0.85rem;
+        padding: 10px 12px;
+      }
+
+      .layer-item {
+        padding: 12px 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -383,17 +414,24 @@
     let isPanoramaxOpen = false;
     let isPanoramaxModeActive = false;
 
+    // Détection mobile
+    function isMobile() {
+      return window.innerWidth <= 768;
+    }
+
     // Layout configuration: 2 Panels (Sidebar + Map)
     function initSplitTwoPanels() {
       if (splitInstance) splitInstance.destroy();
       document.getElementById('panoramax-container').style.display = 'none';
 
-      splitInstance = Split(['#sidebar', '#map'], {
-        sizes: [22, 78],
-        minSize: [200, 300],
-        gutterSize: 6,
-        onDrag: () => { if (map) map.resize(); }
-      });
+      if (!isMobile()) {
+        splitInstance = Split(['#sidebar', '#map'], {
+          sizes: [22, 78],
+          minSize: [200, 300],
+          gutterSize: 6,
+          onDrag: () => { if (map) map.resize(); }
+        });
+      }
       if (map) map.resize();
     }
 
@@ -403,6 +441,287 @@
         if (splitInstance) splitInstance.destroy();
         document.getElementById('panoramax-container').style.display = 'flex';
 
-        splitInstance = Split(['#sidebar', '#map', '#panoramax-container'], {
-          sizes: [20, 48, 32],
-          minSize:
+        if (!isMobile()) {
+          splitInstance = Split(['#sidebar', '#map', '#panoramax-container'], {
+            sizes: [20, 48, 32],
+            minSize: [180, 250, 250],
+            gutterSize: 6,
+            onDrag: () => { if (map) map.resize(); }
+          });
+        }
+
+        isPanoramaxOpen = true;
+      }
+      if (map) map.resize();
+    }
+
+    // Close Panoramax panel
+    function closePanoramaxPanel() {
+      if (splitInstance) splitInstance.destroy();
+      document.getElementById('panoramax-container').style.display = 'none';
+
+      if (!isMobile()) {
+        splitInstance = Split(['#sidebar', '#map'], {
+          sizes: [22, 78],
+          minSize: [200, 300],
+          gutterSize: 6,
+          onDrag: () => { if (map) map.resize(); }
+        });
+      }
+
+      isPanoramaxOpen = false;
+      isPanoramaxModeActive = false;
+
+      const panToggle = document.getElementById('toggle-panoramax');
+      if (panToggle) panToggle.checked = false;
+
+      document.getElementById('instructions-text').innerHTML = `
+        <p><i class="fa-solid fa-circle-info"></i> <strong>Information :</strong> Cochez une couche puis cliquez sur un objet pour afficher sa fiche d'information.</p>
+      `;
+
+      document.getElementById('panoramax-content').innerHTML = `
+        <div class="panoramax-placeholder">
+          <i class="fa-solid fa-street-view"></i>
+          <p>Cliquez sur la carte pour charger la vue 360°.</p>
+        </div>
+      `;
+
+      if (map) map.resize();
+    }
+
+    // Réajuster la carte en cas de changement de taille de fenêtre
+    window.addEventListener('resize', () => {
+      initSplitTwoPanels();
+    });
+
+    // Initialize MapLibre GL Map with OpenStreetMap CartoDB Base Layer
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: {
+        'version': 8,
+        'sources': {
+          'fond-base': {
+            'type': 'raster',
+            'tiles': [
+              'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+              'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png'
+            ],
+            'tileSize': 256,
+            'attribution': '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          }
+        },
+        'layers': [
+          {
+            'id': 'base-layer',
+            'type': 'raster',
+            'source': 'fond-base',
+            'minzoom': 0,
+            'maxzoom': 19
+          }
+        ]
+      },
+      center: OULLINS_PIERRE_BENITE_CENTER,
+      zoom: DEFAULT_ZOOM
+    });
+
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+
+    map.on('load', () => {
+      // 1. Source WMTS Orthophoto Haute Résolution (IGN / Géoplateforme)
+      map.addSource('src-ortho', {
+        'type': 'raster',
+        'tiles': [
+          'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
+        ],
+        'tileSize': 256,
+        'attribution': '&copy; <a href="https://www.geoportail.gouv.fr/" target="_blank">IGN / Géoplateforme</a>'
+      });
+
+      // 2. Calque Orthophoto
+      map.addLayer({
+        'id': 'layer-ortho',
+        'type': 'raster',
+        'source': 'src-ortho',
+        'layout': { 'visibility': 'none' },
+        'paint': {
+          'raster-opacity': 0.7
+        }
+      });
+
+      // 3. Add PMR Layer
+      map.addSource('src-pmr', { type: 'geojson', data: './places_pmr.geojson' });
+      map.addLayer({
+        id: 'layer-pmr',
+        type: 'circle',
+        source: 'src-pmr',
+        layout: { 'visibility': 'none' },
+        paint: {
+          'circle-radius': 7,
+          'circle-color': '#2563eb',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+
+      // 4. Add Livraison Layer
+      map.addSource('src-livraison', { type: 'geojson', data: './places_livraison.geojson' });
+      map.addLayer({
+        id: 'layer-livraison',
+        type: 'circle',
+        source: 'src-livraison',
+        layout: { 'visibility': 'none' },
+        paint: {
+          'circle-radius': 7,
+          'circle-color': '#d97706',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+
+      setupLayerToggle('layer-pmr');
+      setupLayerToggle('layer-livraison');
+    });
+
+    // Écouteurs pour l'Orthophoto et le Slider d'opacité
+    const orthoCheckbox = document.getElementById('toggle-ortho');
+    const opacityContainer = document.getElementById('ortho-opacity-container');
+    const opacitySlider = document.getElementById('ortho-opacity-slider');
+    const opacityValueText = document.getElementById('ortho-opacity-val');
+
+    if (orthoCheckbox) {
+      orthoCheckbox.checked = false;
+
+      orthoCheckbox.addEventListener('change', (e) => {
+        const isChecked = e.target.checked;
+        
+        map.setLayoutProperty('layer-ortho', 'visibility', isChecked ? 'visible' : 'none');
+        
+        if (opacityContainer) {
+          opacityContainer.style.display = isChecked ? 'block' : 'none';
+        }
+      });
+    }
+
+    if (opacitySlider) {
+      opacitySlider.addEventListener('input', (e) => {
+        const opacityVal = parseInt(e.target.value, 10);
+        const opacityDecimal = opacityVal / 100;
+
+        if (opacityValueText) {
+          opacityValueText.textContent = `${opacityVal}%`;
+        }
+
+        map.setPaintProperty('layer-ortho', 'raster-opacity', opacityDecimal);
+      });
+    }
+
+    function setupLayerToggle(layerId) {
+      const checkbox = document.getElementById(layerId);
+      if (checkbox) {
+        checkbox.checked = false;
+        checkbox.addEventListener('change', (e) => {
+          map.setLayoutProperty(layerId, 'visibility', e.target.checked ? 'visible' : 'none');
+        });
+      }
+    }
+
+    // Toggle Panoramax mode on/off
+    document.getElementById('toggle-panoramax').addEventListener('change', (e) => {
+      isPanoramaxModeActive = e.target.checked;
+      const infoBox = document.getElementById('instructions-text');
+
+      if (isPanoramaxModeActive) {
+        infoBox.innerHTML = `
+          <p><i class="fa-solid fa-camera-retro"></i> <strong>Mode Panoramax actif :</strong> Cliquez n'importe où sur la carte pour charger la vue 360° correspondante.</p>
+        `;
+      } else {
+        closePanoramaxPanel();
+      }
+    });
+
+    // Unified Click Handler
+    map.on('click', (e) => {
+      if (isPanoramaxModeActive) {
+        const lng = e.lngLat.lng;
+        const lat = e.lngLat.lat;
+
+        openPanoramaxPanel();
+
+        const panoramaxUrl = `https://explore.panoramax.fr/#map=18/${lat}/${lng}`;
+        const container = document.getElementById('panoramax-content');
+        container.innerHTML = `
+          <iframe 
+            id="panoramax-frame"
+            src="${panoramaxUrl}" 
+            allow="geolocation"
+            title="Vue Panoramax 360°">
+          </iframe>
+        `;
+      } else {
+        const bbox = [[e.point.x - 5, e.point.y - 5], [e.point.x + 5, e.point.y + 5]];
+        const features = map.queryRenderedFeatures(bbox, {
+          layers: ['layer-pmr', 'layer-livraison']
+        });
+
+        if (features.length > 0) {
+          const feature = features[0];
+          const props = feature.properties;
+          let content = '';
+
+          if (feature.layer.id === 'layer-pmr') {
+            content = `
+              <div class="popup-title">
+                <i class="fa-solid fa-wheelchair" style="color:#2563eb"></i> Place PMR
+              </div>
+              <div class="popup-detail"><strong>Adresse :</strong> ${props["Adresse"] || 'Non renseignée'}</div>
+              <div class="popup-detail"><strong>Nombre de places :</strong> ${props["Nb Places"] || 1}</div>
+              <div class="popup-detail"><strong>Commune :</strong> ${props["COMMUNE"] || 'OULLINS-PIERRE-BENITE'}</div>
+              <div class="popup-detail"><strong>Signalisation (SVA) :</strong> ${props["SVA"] || 'N/A'}</div>
+              <div class="popup-detail"><strong>Panonceau Fourrière :</strong> ${props["Panonceau Fourrière"] || 'Non'}</div>
+            `;
+          } else if (feature.layer.id === 'layer-livraison') {
+            content = `
+              <div class="popup-title">
+                <i class="fa-solid fa-truck-ramp-box" style="color:#d97706"></i> Aire de livraison
+              </div>
+              <div class="popup-detail"><strong>Adresse :</strong> ${props["Adresse"] || 'Non renseignée'}</div>
+              <div class="popup-detail"><strong>Nombre de places :</strong> ${props["Nb_Places"] || 'N/A'}</div>
+              <div class="popup-detail"><strong>Horaires :</strong> ${props["Heures"] || 'Non renseignés'}</div>
+              <div class="popup-detail"><strong>Stationnement :</strong> ${props["Stationnement"] || 'N/A'}</div>
+              <div class="popup-detail"><strong>Mise en fourrière :</strong> ${props["Mise en Fourrière"] || 'Non'}</div>
+            `;
+          }
+
+          new maplibregl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(content)
+            .addTo(map);
+        }
+      }
+    });
+
+    // Cursor feedback on hoverable features
+    map.on('mousemove', (e) => {
+      if (!isPanoramaxModeActive) {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: ['layer-pmr', 'layer-livraison']
+        });
+        map.getCanvas().style.cursor = features.length ? 'pointer' : '';
+      } else {
+        map.getCanvas().style.cursor = 'crosshair';
+      }
+    });
+
+    // Close button click listener
+    document.getElementById('close-panoramax').addEventListener('click', () => {
+      closePanoramaxPanel();
+    });
+
+    // Start in 2-panel mode
+    window.addEventListener('DOMContentLoaded', () => {
+      initSplitTwoPanels();
+    });
+
+  </script>
+</body>
+</html>
