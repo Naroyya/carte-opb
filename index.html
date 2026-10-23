@@ -175,10 +175,72 @@
       margin-right: 6px;
     }
 
-    /* Map Panel */
+    /* Map Panel & Search Bar */
     #map {
       background-color: #e2e8f0;
       position: relative;
+    }
+
+    .search-container {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 30;
+      width: 320px;
+      max-width: calc(100% - 24px);
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 4px 12px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .search-box i {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-right: 8px;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      width: 100%;
+      padding: 8px 0;
+      font-size: 0.88rem;
+      color: #1e293b;
+    }
+
+    .search-results {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin-top: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      border: 1px solid #e2e8f0;
+    }
+
+    .search-result-item {
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      color: #334155;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .search-result-item:hover {
+      background-color: #f8fafc;
+      color: #2563eb;
     }
 
     /* Panoramax Panel */
@@ -383,7 +445,16 @@
     </div>
 
     <!-- Center Map Panel -->
-    <div id="map" class="split"></div>
+    <div id="map" class="split">
+      <!-- Zone de recherche d'adresse -->
+      <div class="search-container">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="search-input" placeholder="Rechercher une adresse..." autocomplete="off">
+        </div>
+        <div id="search-results" class="search-results"></div>
+      </div>
+    </div>
 
     <!-- Right Panoramax Viewer Panel -->
     <div id="panoramax-container" class="split">
@@ -413,6 +484,7 @@
     let splitInstance = null;
     let isPanoramaxOpen = false;
     let isPanoramaxModeActive = false;
+    let searchMarker = null;
 
     // Détection mobile
     function isMobile() {
@@ -494,8 +566,7 @@
       initSplitTwoPanels();
     });
 
-    // Initialize MapLibre GL Map with OpenStreetMap CartoDB Base Layer
-    // Initialize MapLibre GL Map with OpenStreetMap Base Layer (Sans API Key)
+    // Initialize MapLibre GL Map with OpenStreetMap Base Layer
     const map = new maplibregl.Map({
       container: 'map',
       style: {
@@ -624,6 +695,71 @@
         });
       }
     }
+
+    // Logic pour la recherche d'adresse (API BAN - adresse.data.gouv.fr)
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    let searchDebounceTimeout = null;
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+      clearTimeout(searchDebounceTimeout);
+
+      if (query.length < 3) {
+        searchResults.style.display = 'none';
+        searchResults.innerHTML = '';
+        return;
+      }
+
+      searchDebounceTimeout = setTimeout(() => {
+        // Recherche priorisée sur Oullins-Pierre-Bénite (postcode=69600 ou lat/lon)
+        const apiUrl = `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&lat=45.7140&lon=4.8080&limit=5`;
+
+        fetch(apiUrl)
+          .then(res => res.json())
+          .then(data => {
+            searchResults.innerHTML = '';
+            if (data.features && data.features.length > 0) {
+              data.features.forEach(feature => {
+                const item = document.createElement('div');
+                item.className = 'search-result-item';
+                item.textContent = feature.properties.label;
+                item.addEventListener('click', () => {
+                  const [lng, lat] = feature.geometry.coordinates;
+
+                  map.flyTo({
+                    center: [lng, lat],
+                    zoom: 17,
+                    essential: true
+                  });
+
+                  if (searchMarker) searchMarker.remove();
+                  searchMarker = new maplibregl.Marker({ color: '#dc2626' })
+                    .setLngLat([lng, lat])
+                    .setPopup(new maplibregl.Popup().setHTML(`<strong>${feature.properties.label}</strong>`))
+                    .addTo(map);
+
+                  searchResults.style.display = 'none';
+                  searchInput.value = feature.properties.label;
+                });
+                searchResults.appendChild(item);
+              });
+              searchResults.style.display = 'block';
+            } else {
+              searchResults.style.display = 'none';
+            }
+          })
+          .catch(() => {
+            searchResults.style.display = 'none';
+          });
+      }, 300);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-container')) {
+        searchResults.style.display = 'none';
+      }
+    });
 
     // Toggle Panoramax mode on/off
     document.getElementById('toggle-panoramax').addEventListener('change', (e) => {
