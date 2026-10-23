@@ -148,3 +148,126 @@
       gap: 8px;
       flex: 1;
     }
+
+    .layer-badge {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .badge-pmr { background-color: #2563eb; }
+    .badge-livraison { background-color: #d97706; }
+    .badge-panoramax { background-color: #10b981; }
+
+    .instructions-card {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.8rem;
+      color: #1e40af;
+      line-height: 1.45;
+      margin-top: 20px;
+    }
+
+    .instructions-card i {
+      margin-right: 6px;
+    }
+
+    /* Map Panel & Search Bar */
+    #map {
+      background-color: #e2e8f0;
+      position: relative;
+    }
+
+    .search-container {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 30;
+      width: 340px;
+      max-width: calc(100% - 24px);
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 4px 12px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .search-box i {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-right: 8px;
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      width: 100%;
+      padding: 8px 0;
+      font-size: 0.88rem;
+      color: #1e293b;
+    }
+
+    .search-results {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin-top: 4px;
+      max-height: 220px;
+      overflow-y: auto;
+      display: none;
+      border: 1px solid #e2e8f0;
+    }
+
+    .search-result-item {
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      color: #334155;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .search-result-item:hover {
+      background-color: #f8fafc;
+      color: #2563eb;
+    }
+
+    /* Panoramax Panel */
+    #panoramax-container {
+      background-color: #0f172a;
+      display: none;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 30;
+      width: 34px;
+      height: 34px;
+      background-color: rgba(15, 23, 42, 0.85);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      backdrop-filter: blur(4px);
+      transition
