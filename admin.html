@@ -59,4 +59,687 @@
       flex-direction: column;
       gap: 8px;
     }
-    #github-config-box.open { display:
+    #github-config-box.open { display: flex; }
+    .config-title { font-size: 0.78rem; font-weight: 700; color: #0f172a; text-transform: uppercase; }
+    .config-row { display: flex; gap: 8px; }
+    .config-row input, #gh-token {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      font-size: 0.82rem;
+    }
+
+    .content { padding: 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+
+    .step-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #1e40af;
+      line-height: 1.4;
+    }
+
+    .archive-toggle-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      color: #334155;
+    }
+
+    .archive-toggle-box label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .archive-badge {
+      background: #e2e8f0;
+      color: #475569;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 0.78rem; font-weight: 600; color: #475569; }
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.86rem;
+      font-family: inherit;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .row-dates { display: flex; gap: 10px; }
+    .row-dates .form-group { flex: 1; }
+
+    .btn {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.86rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .btn-primary { background: #2563eb; color: #ffffff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    .btn-publish { background: #16a34a; color: #ffffff; font-size: 0.9rem; padding: 12px; }
+    .btn-publish:hover { background: #15803d; }
+    .btn-publish:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    .btn-secondary { background: #e2e8f0; color: #334155; font-size: 0.8rem; padding: 8px; }
+    .btn-secondary:hover { background: #cbd5e1; }
+
+    .status-msg {
+      font-size: 0.8rem;
+      padding: 8px 10px;
+      border-radius: 6px;
+      display: none;
+      line-height: 1.35;
+    }
+    .status-success { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .status-error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .status-info { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+
+    /* Carte */
+    #map { flex: 1; position: relative; }
+
+    .map-controls-overlay {
+      position: absolute;
+      bottom: 24px;
+      left: 12px;
+      z-index: 20;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-container {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 30;
+      width: 300px;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .search-box input { border: none; outline: none; width: 100%; margin-left: 8px; font-size: 0.85rem; }
+    .search-results {
+      background: #fff;
+      border-radius: 6px;
+      margin-top: 4px;
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .search-item { padding: 8px; cursor: pointer; font-size: 0.8rem; border-bottom: 1px solid #f1f5f9; }
+    .search-item:hover { background: #f8fafc; color: #2563eb; }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <div id="form-panel">
+    <div class="header">
+      <div>
+        <h1><i class="fa-solid fa-draw-polygon"></i> Saisie des Travaux</h1>
+        <p>Publication directe GitHub</p>
+      </div>
+      <button id="toggle-config" class="btn-config-toggle" title="Paramètres de connexion GitHub">
+        <i class="fa-solid fa-gear"></i> GitHub
+      </button>
+    </div>
+
+    <!-- Configuration GitHub -->
+    <div id="github-config-box">
+      <div class="config-title"><i class="fa-brands fa-github"></i> Connexion au dépôt</div>
+      <div class="config-row">
+        <input type="text" id="gh-owner" placeholder="Utilisateur / Orga">
+        <input type="text" id="gh-repo" placeholder="Nom du dépôt">
+      </div>
+      <input type="password" id="gh-token" placeholder="Jeton GitHub (Fine-grained Token)">
+      <button id="btn-save-config" class="btn btn-secondary">
+        <i class="fa-solid fa-floppy-disk"></i> Mémoriser sur ce poste
+      </button>
+    </div>
+
+    <div class="content">
+      <div class="step-box">
+        <strong>1.</strong> Tracez le polygone <i class="fa-solid fa-draw-polygon"></i> sur la carte (double-clic pour fermer).<br>
+        <strong>2.</strong> Renseignez les champs, joignez le PDF et cliquez sur <strong>Publier</strong>.
+      </div>
+
+      <!-- Filtre d'affichage des travaux passés -->
+      <div class="archive-toggle-box">
+        <label>
+          <input type="checkbox" id="toggle-show-archived" style="cursor:pointer;">
+          <span>Afficher les travaux passés</span>
+        </label>
+        <span class="archive-badge" id="archived-count" title="Nombre de chantiers passés conservés en archive">0 archive</span>
+      </div>
+
+      <div id="draw-status" class="status-msg status-error" style="display: block;">
+        <i class="fa-solid fa-circle-info"></i> Aucune forme sélectionnée sur la carte.
+      </div>
+
+      <div class="form-group">
+        <label>Adresse / Localisation du chantier *</label>
+        <input type="text" id="f-adresse" placeholder="Ex: Rue du Perron (entre n°30 et n°42)" required>
+      </div>
+
+      <div class="form-group">
+        <label>Nature des travaux *</label>
+        <select id="f-nature">
+          <option value="Voirie / Chaussée">Voirie / Chaussée</option>
+          <option value="Réseaux (Eau, Gaz, Électricité, Fibre)">Réseaux (Eau, Gaz, Électricité, Fibre)</option>
+          <option value="Bâtiment / Échafaudage">Bâtiment / Échafaudage</option>
+          <option value="Espaces verts / Élagage">Espaces verts / Élagage</option>
+          <option value="Manifestation / Déménagement">Manifestation / Déménagement</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+
+      <div class="row-dates">
+        <div class="form-group">
+          <label>Date de début *</label>
+          <input type="date" id="f-debut" required>
+        </div>
+        <div class="form-group">
+          <label>Date de fin *</label>
+          <input type="date" id="f-fin" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Restrictions / Précisions</label>
+        <textarea id="f-desc" rows="2" placeholder="Ex: Route barrée, stationnement interdit..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Arrêté municipal (Fichier PDF) *</label>
+        <input type="file" id="f-pdf-file" accept="application/pdf">
+        <small id="current-pdf-label" style="font-size:0.75rem; color:#64748b;"></small>
+      </div>
+
+      <button id="btn-save-feature" class="btn btn-primary" disabled>
+        <i class="fa-solid fa-check"></i> Valider la zone sur la carte
+      </button>
+
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 2px 0;">
+
+      <button id="btn-publish-github" class="btn btn-publish">
+        <i class="fa-solid fa-cloud-arrow-up"></i> Publier en direct sur GitHub (<span id="count-features">0</span>)
+      </button>
+
+      <div id="publish-status" class="status-msg"></div>
+
+      <button id="btn-download" class="btn btn-secondary">
+        <i class="fa-solid fa-download"></i> Sauvegarde locale (travaux.geojson)
+      </button>
+    </div>
+  </div>
+
+  <!-- Carte -->
+  <div id="map">
+    <div class="search-container">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass" style="color:#64748b;"></i>
+        <input type="text" id="search-input" placeholder="Aller à une adresse..." autocomplete="off">
+      </div>
+      <div id="search-results" class="search-results"></div>
+    </div>
+
+    <div class="map-controls-overlay">
+      <input type="checkbox" id="toggle-ortho" style="cursor:pointer;">
+      <label for="toggle-ortho" style="cursor:pointer; font-weight:500;">Afficher Orthophoto IGN</label>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
+
+<script>
+  // --- 1. Gestion de la configuration GitHub (localStorage) ---
+  const configBox = document.getElementById('github-config-box');
+  const ghOwnerInput = document.getElementById('gh-owner');
+  const ghRepoInput = document.getElementById('gh-repo');
+  const ghTokenInput = document.getElementById('gh-token');
+
+  function detectRepoFromUrl() {
+    const host = window.location.hostname;
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    if (host.endsWith('.github.io')) {
+      const owner = host.replace('.github.io', '');
+      const repo = pathParts.length > 0 ? pathParts[0] : '';
+      return { owner, repo };
+    }
+    return { owner: '', repo: '' };
+  }
+
+  function loadConfig() {
+    const detected = detectRepoFromUrl();
+    ghOwnerInput.value = localStorage.getItem('gh_owner') || detected.owner;
+    ghRepoInput.value = localStorage.getItem('gh_repo') || detected.repo;
+    ghTokenInput.value = localStorage.getItem('gh_token') || '';
+
+    if (!ghTokenInput.value) {
+      configBox.classList.add('open');
+    }
+  }
+
+  document.getElementById('toggle-config').addEventListener('click', () => {
+    configBox.classList.toggle('open');
+  });
+
+  document.getElementById('btn-save-config').addEventListener('click', () => {
+    localStorage.setItem('gh_owner', ghOwnerInput.value.trim());
+    localStorage.setItem('gh_repo', ghRepoInput.value.trim());
+    localStorage.setItem('gh_token', ghTokenInput.value.trim());
+    configBox.classList.remove('open');
+    showPublishStatus("Configuration GitHub mémorisée sur ce poste.", "success");
+  });
+
+  loadConfig();
+
+  // --- 2. Initialisation de la carte & MapboxDraw ---
+  const map = new maplibregl.Map({
+    container: 'map',
+    style: {
+      'version': 8,
+      'sources': {
+        'osm': {
+          'type': 'raster',
+          'tiles': ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+          'tileSize': 256
+        }
+      },
+      'layers': [{ 'id': 'osm-layer', 'type': 'raster', 'source': 'osm' }]
+    },
+    center: [4.8080, 45.7140],
+    zoom: 15
+  });
+
+  map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+
+  const draw = new MapboxDraw({
+    displayControlsDefault: false,
+    controls: { polygon: true, line_string: true, point: true, trash: true },
+    defaultMode: 'draw_polygon'
+  });
+  map.addControl(draw, 'top-right');
+
+  let selectedFeatureId = null;
+  // Stocke les travaux passés lorsqu'ils sont masqués sur la carte afin de ne jamais les perdre à l'export
+  let hiddenArchivedFeatures = [];
+
+  function isFeatureArchived(feature) {
+    const today = new Date().toISOString().split('T')[0];
+    const dateFin = feature.properties && feature.properties.Date_fin;
+    return dateFin && dateFin < today;
+  }
+
+  // Construit le FeatureCollection complet (formes visibles + archives masquées)
+  function getCompleteGeoJSON() {
+    const visibleData = draw.getAll();
+    return {
+      type: 'FeatureCollection',
+      features: [...visibleData.features, ...hiddenArchivedFeatures]
+    };
+  }
+
+  function updateCount() {
+    const total = draw.getAll().features.length + hiddenArchivedFeatures.length;
+    document.getElementById('count-features').textContent = total;
+    
+    const archivedVisibleCount = draw.getAll().features.filter(isFeatureArchived).length;
+    const totalArchived = hiddenArchivedFeatures.length + archivedVisibleCount;
+    document.getElementById('archived-count').textContent = `${totalArchived} archive${totalArchived > 1 ? 's' : ''}`;
+  }
+
+  // Bascule affichage/masquage des travaux passés
+  document.getElementById('toggle-show-archived').addEventListener('change', (e) => {
+    const showArchived = e.target.checked;
+    if (showArchived) {
+      // Réintégrer les archives masquées dans MapboxDraw
+      if (hiddenArchivedFeatures.length > 0) {
+        draw.add({ type: 'FeatureCollection', features: hiddenArchivedFeatures });
+        hiddenArchivedFeatures = [];
+      }
+    } else {
+      // Extraire les travaux passés de MapboxDraw et les mettre en mémoire tampon
+      const currentAll = draw.getAll().features;
+      const toHide = [];
+      const toKeep = [];
+
+      currentAll.forEach(feat => {
+        if (isFeatureArchived(feat)) {
+          toHide.push(feat);
+        } else {
+          toKeep.push(feat);
+        }
+      });
+
+      hiddenArchivedFeatures = toHide;
+      draw.set({ type: 'FeatureCollection', features: toKeep });
+      handleSelectionChange();
+    }
+    updateCount();
+  });
+
+  map.on('load', () => {
+    map.addSource('src-ortho', {
+      'type': 'raster',
+      'tiles': ['https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'],
+      'tileSize': 256
+    });
+    map.addLayer({
+      'id': 'layer-ortho',
+      'type': 'raster',
+      'source': 'src-ortho',
+      'layout': { 'visibility': 'none' }
+    });
+
+    fetch('./travaux.geojson?t=' + Date.now())
+      .then(res => res.ok ? res.json() : { type: 'FeatureCollection', features: [] })
+      .then(data => {
+        if (data && data.features) {
+          const showArchived = document.getElementById('toggle-show-archived').checked;
+          if (showArchived) {
+            draw.add(data);
+          } else {
+            const activeFeatures = [];
+            hiddenArchivedFeatures = [];
+            data.features.forEach(feat => {
+              if (isFeatureArchived(feat)) {
+                hiddenArchivedFeatures.push(feat);
+              } else {
+                activeFeatures.push(feat);
+              }
+            });
+            draw.add({ type: 'FeatureCollection', features: activeFeatures });
+          }
+          updateCount();
+        }
+      })
+      .catch(() => console.log("Prêt pour un nouveau fichier travaux.geojson"));
+  });
+
+  document.getElementById('toggle-ortho').addEventListener('change', (e) => {
+    map.setLayoutProperty('layer-ortho', 'visibility', e.target.checked ? 'visible' : 'none');
+  });
+
+  // --- 3. Sélection et validation d'une zone ---
+  function handleSelectionChange() {
+    const selected = draw.getSelected();
+    const statusBox = document.getElementById('draw-status');
+    const btnSave = document.getElementById('btn-save-feature');
+    const pdfLabel = document.getElementById('current-pdf-label');
+
+    if (selected.features.length > 0) {
+      const feat = selected.features[0];
+      selectedFeatureId = feat.id;
+      const p = feat.properties || {};
+
+      document.getElementById('f-adresse').value = p.Adresse || '';
+      document.getElementById('f-nature').value = p.Nature || 'Voirie / Chaussée';
+      document.getElementById('f-debut').value = p.Date_debut || '';
+      document.getElementById('f-fin').value = p.Date_fin || '';
+      document.getElementById('f-desc').value = p.Description || '';
+      document.getElementById('f-pdf-file').value = '';
+      pdfLabel.textContent = p.Lien_PDF ? `Fichier actuel : ${p.Lien_PDF}` : 'Aucun PDF associé';
+
+      statusBox.className = 'status-msg status-success';
+      statusBox.innerHTML = `<i class="fa-solid fa-check-circle"></i> Zone sélectionnée. Complétez la fiche puis cliquez sur "Valider la zone".`;
+      btnSave.disabled = false;
+    } else {
+      selectedFeatureId = null;
+      statusBox.className = 'status-msg status-error';
+      statusBox.innerHTML = `<i class="fa-solid fa-circle-info"></i> Cliquez sur une forme ou tracez-en une nouvelle.`;
+      btnSave.disabled = true;
+    }
+    updateCount();
+  }
+
+  map.on('draw.create', handleSelectionChange);
+  map.on('draw.selectionchange', handleSelectionChange);
+  map.on('draw.delete', handleSelectionChange);
+
+  function sanitizeFilename(name) {
+    return name
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9._-]/g, '-');
+  }
+
+  document.getElementById('btn-save-feature').addEventListener('click', () => {
+    if (!selectedFeatureId) return;
+
+    const adresse = document.getElementById('f-adresse').value.trim();
+    const debut = document.getElementById('f-debut').value;
+    const fin = document.getElementById('f-fin').value;
+    const pdfInput = document.getElementById('f-pdf-file');
+    const existingFeat = draw.get(selectedFeatureId);
+    const existingPdf = existingFeat.properties ? existingFeat.properties.Lien_PDF : '';
+
+    if (!adresse || !debut || !fin) {
+      alert("Veuillez renseigner l'adresse, la date de début et la date de fin.");
+      return;
+    }
+
+    let pdfPath = existingPdf;
+    if (pdfInput.files.length > 0) {
+      const cleanName = sanitizeFilename(pdfInput.files[0].name);
+      pdfPath = `./arretes/${cleanName}`;
+    } else if (!existingPdf) {
+      alert("Veuillez sélectionner le fichier PDF de l'arrêté.");
+      return;
+    }
+
+    draw.setFeatureProperty(selectedFeatureId, 'Adresse', adresse);
+    draw.setFeatureProperty(selectedFeatureId, 'Nature', document.getElementById('f-nature').value);
+    draw.setFeatureProperty(selectedFeatureId, 'Date_debut', debut);
+    draw.setFeatureProperty(selectedFeatureId, 'Date_fin', fin);
+    draw.setFeatureProperty(selectedFeatureId, 'Description', document.getElementById('f-desc').value.trim());
+    draw.setFeatureProperty(selectedFeatureId, 'Lien_PDF', pdfPath);
+
+    document.getElementById('current-pdf-label').textContent = `Prêt à publier : ${pdfPath}`;
+    showPublishStatus("Zone validée localement. Cliquez maintenant sur le bouton vert « Publier en direct sur GitHub ».", "info");
+    updateCount();
+  });
+
+  // --- 4. Envoi direct vers l'API GitHub (PDF + GeoJSON complet) ---
+  function showPublishStatus(msg, type) {
+    const box = document.getElementById('publish-status');
+    box.className = `status-msg status-${type}`;
+    box.style.display = 'block';
+    box.innerHTML = msg;
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function utf8ToBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
+  async function getGitHubFileSha(owner, repo, path, token) {
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+    const res = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json'
+      }
+    });
+    if (res.status === 200) {
+      const data = await res.json();
+      return data.sha;
+    }
+    return null;
+  }
+
+  async function putGitHubFile(owner, repo, path, base64Content, message, token) {
+    const sha = await getGitHubFileSha(owner, repo, path, token);
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+    const body = {
+      message: message,
+      content: base64Content
+    };
+    if (sha) body.sha = sha;
+
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.message || `Erreur HTTP ${res.status}`);
+    }
+    return await res.json();
+  }
+
+  document.getElementById('btn-publish-github').addEventListener('click', async () => {
+    const owner = ghOwnerInput.value.trim();
+    const repo = ghRepoInput.value.trim();
+    const token = ghTokenInput.value.trim();
+
+    if (!owner || !repo || !token) {
+      configBox.classList.add('open');
+      showPublishStatus("Veuillez renseigner vos paramètres GitHub (Utilisateur, Dépôt et Jeton) en haut du panneau.", "error");
+      return;
+    }
+
+    const btn = document.getElementById('btn-publish-github');
+    btn.disabled = true;
+
+    try {
+      const pdfInput = document.getElementById('f-pdf-file');
+      if (pdfInput.files.length > 0) {
+        const file = pdfInput.files[0];
+        const cleanName = sanitizeFilename(file.name);
+        showPublishStatus(`<i class="fa-solid fa-spinner fa-spin"></i> Envoi du PDF (${cleanName}) vers GitHub...`, "info");
+        
+        const pdfBase64 = await fileToBase64(file);
+        await putGitHubFile(
+          owner,
+          repo,
+          `arretes/${cleanName}`,
+          pdfBase64,
+          `Ajout arrêté PDF : ${cleanName}`,
+          token
+        );
+      }
+
+      showPublishStatus(`<i class="fa-solid fa-spinner fa-spin"></i> Mise à jour de la carte (travaux.geojson)...`, "info");
+      // Export complet incluant les archives masquées
+      const geojsonData = getCompleteGeoJSON();
+      const geojsonBase64 = utf8ToBase64(JSON.stringify(geojsonData, null, 2));
+
+      await putGitHubFile(
+        owner,
+        repo,
+        'travaux.geojson',
+        geojsonBase64,
+        'Mise à jour des zones de travaux via admin.html',
+        token
+      );
+
+      showPublishStatus(
+        `<i class="fa-solid fa-circle-check"></i> <strong>Publication réussie !</strong> Le PDF et la carte (${geojsonData.features.length} chantiers au total) ont été envoyés sur GitHub.`,
+        "success"
+      );
+      pdfInput.value = '';
+    } catch (err) {
+      showPublishStatus(`<i class="fa-solid fa-triangle-exclamation"></i> Échec de la publication : ${err.message}`, "error");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // Sauvegarde locale de secours (inclut également les archives masquées)
+  document.getElementById('btn-download').addEventListener('click', () => {
+    const data = getCompleteGeoJSON();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'travaux.geojson';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // Recherche d'adresse rapide
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  searchInput.addEventListener('input', (e) => {
+    const q = e.target.value.trim();
+    if (q.length < 3) { searchResults.style.display = 'none'; return; }
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q + ' Oullins-Pierre-Bénite')}&format=json&limit=5`)
+      .then(r => r.json())
+      .then(data => {
+        searchResults.innerHTML = '';
+        if (data.length > 0) {
+          data.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'search-item';
+            div.textContent = item.display_name;
+            div.onclick = () => {
+              map.flyTo({ center: [parseFloat(item.lon), parseFloat(item.lat)], zoom: 18 });
+              searchResults.style.display = 'none';
+            };
+            searchResults.appendChild(div);
+          });
+          searchResults.style.display = 'block';
+        }
+      });
+  });
+</script>
+</body>
+</html>
