@@ -606,6 +606,73 @@
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 
     map.on('load', () => {
+      const today = new Date().toISOString().split('T')[0];
+
+map.addSource('src-travaux', { type: 'geojson', data: './travaux.geojson' });
+
+// 1. Remplissage des polygones (Zones de travaux)
+map.addLayer({
+  id: 'layer-travaux-fill',
+  type: 'fill',
+  source: 'src-travaux',
+  filter: ['==', '$type', 'Polygon'],
+  layout: { 'visibility': 'visible' },
+  paint: {
+    'fill-color': [
+      'case',
+      ['>', ['get', 'Date_debut'], today], '#f59e0b', // À venir
+      ['<', ['get', 'Date_fin'], today], '#94a3b8',   // Passé
+      '#ef4444'                                       // En cours
+    ],
+    'fill-opacity': 0.35
+  }
+});
+
+// 2. Contours des polygones et tracés linéaires (Rues barrées)
+map.addLayer({
+  id: 'layer-travaux-line',
+  type: 'line',
+  source: 'src-travaux',
+  filter: ['in', '$type', 'Polygon', 'LineString'],
+  layout: { 'visibility': 'visible' },
+  paint: {
+    'line-color': [
+      'case',
+      ['>', ['get', 'Date_debut'], today], '#d97706',
+      ['<', ['get', 'Date_fin'], today], '#64748b',
+      '#dc2626'
+    ],
+    'line-width': 3
+  }
+});
+
+// 3. Points ponctuels
+map.addLayer({
+  id: 'layer-travaux-point',
+  type: 'circle',
+  source: 'src-travaux',
+  filter: ['==', '$type', 'Point'],
+  layout: { 'visibility': 'visible' },
+  paint: {
+    'circle-radius': 8,
+    'circle-color': [
+      'case',
+      ['>', ['get', 'Date_debut'], today], '#f59e0b',
+      ['<', ['get', 'Date_fin'], today], '#94a3b8',
+      '#ef4444'
+    ],
+    'circle-stroke-width': 2,
+    'circle-stroke-color': '#ffffff'
+  }
+});
+
+// Case à cocher pour masquer/afficher l'ensemble des calques travaux
+document.getElementById('layer-travaux').addEventListener('change', (e) => {
+  const vis = e.target.checked ? 'visible' : 'none';
+  map.setLayoutProperty('layer-travaux-fill', 'visibility', vis);
+  map.setLayoutProperty('layer-travaux-line', 'visibility', vis);
+  map.setLayoutProperty('layer-travaux-point', 'visibility', vis);
+});
       // 1. Orthophoto
       map.addSource('src-ortho', {
         'type': 'raster',
