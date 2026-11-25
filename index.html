@@ -159,15 +159,16 @@
 
     .badge-pmr { background-color: #2563eb; }
     .badge-livraison { background-color: #d97706; }
-    .badge-travaux { background-color: #ef4444; }
+    .badge-travaux-actifs { background-color: #ef4444; }
+    .badge-travaux-passes { background-color: #94a3b8; }
     .badge-panoramax { background-color: #10b981; }
 
     .travaux-legend {
-      font-size: 0.76rem;
+      font-size: 0.75rem;
       color: #64748b;
-      padding: 6px 10px;
+      padding: 5px 10px;
       display: flex;
-      justify-content: space-between;
+      gap: 14px;
       background: #f8fafc;
       border-radius: 6px;
       border: 1px solid #f1f5f9;
@@ -392,13 +393,13 @@
 
       #sidebar {
         width: 100% !important;
-        max-height: 42vh;
+        max-height: 44vh;
         overflow-y: auto;
       }
 
       #map {
         width: 100% !important;
-        height: 58vh !important;
+        height: 56vh !important;
       }
 
       .maplibregl-popup-content {
@@ -429,17 +430,24 @@
         <div class="section-title">Voirie & Chantiers</div>
         <div class="layer-group">
           <label class="layer-item">
-            <input type="checkbox" id="layer-travaux" checked>
+            <input type="checkbox" id="filter-travaux-actifs" checked>
             <span class="layer-label">
-              <span class="layer-badge badge-travaux"></span>
-              Arrêtés de travaux
+              <span class="layer-badge badge-travaux-actifs"></span>
+              Travaux en cours & à venir
             </span>
           </label>
           <div class="travaux-legend">
             <span><strong style="color:#ef4444;">■</strong> En cours</span>
             <span><strong style="color:#f59e0b;">■</strong> À venir</span>
-            <span><strong style="color:#94a3b8;">■</strong> Passés</span>
           </div>
+
+          <label class="layer-item">
+            <input type="checkbox" id="filter-travaux-passes">
+            <span class="layer-label">
+              <span class="layer-badge badge-travaux-passes"></span>
+              Travaux passés (archives)
+            </span>
+          </label>
         </div>
 
         <!-- Section Données communales -->
@@ -551,7 +559,7 @@
       if (!isMobile()) {
         splitInstance = Split(['#sidebar', '#map'], {
           sizes: [22, 78],
-          minSize: [210, 300],
+          minSize: [215, 300],
           gutterSize: 6,
           onDrag: () => { if (map) map.resize(); }
         });
@@ -585,7 +593,7 @@
       if (!isMobile()) {
         splitInstance = Split(['#sidebar', '#map'], {
           sizes: [22, 78],
-          minSize: [210, 300],
+          minSize: [215, 300],
           gutterSize: 6,
           onDrag: () => { if (map) map.resize(); }
         });
@@ -646,6 +654,45 @@
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 
+    // Met à jour dynamiquement le filtrage des travaux (En cours & à venir vs Passés)
+    function updateTravauxFilters() {
+      const showActifs = document.getElementById('filter-travaux-actifs').checked;
+      const showPasses = document.getElementById('filter-travaux-passes').checked;
+      const today = new Date().toISOString().split('T')[0];
+
+      const layers = ['layer-travaux-fill', 'layer-travaux-line', 'layer-travaux-point'];
+
+      if (!showActifs && !showPasses) {
+        layers.forEach(id => map.setLayoutProperty(id, 'visibility', 'none'));
+        return;
+      }
+
+      layers.forEach(id => map.setLayoutProperty(id, 'visibility', 'visible'));
+
+      let dateFilter;
+      if (showActifs && showPasses) {
+        dateFilter = true; // Tout afficher
+      } else if (showActifs) {
+        dateFilter = ['>=', ['get', 'Date_fin'], today]; // En cours ou à venir
+      } else {
+        dateFilter = ['<', ['get', 'Date_fin'], today];  // Passés uniquement
+      }
+
+      const geomFilters = {
+        'layer-travaux-fill': ['==', ['geometry-type'], 'Polygon'],
+        'layer-travaux-line': ['in', ['geometry-type'], ['literal', ['Polygon', 'LineString']]],
+        'layer-travaux-point': ['==', ['geometry-type'], 'Point']
+      };
+
+      layers.forEach(id => {
+        if (dateFilter === true) {
+          map.setFilter(id, geomFilters[id]);
+        } else {
+          map.setFilter(id, ['all', geomFilters[id], dateFilter]);
+        }
+      });
+    }
+
     map.on('load', () => {
       const today = new Date().toISOString().split('T')[0];
 
@@ -670,14 +717,13 @@
       });
 
       // 2. Couche Travaux (Polygones, Lignes, Points)
-      map.addSource('src-travaux', { type: 'geojson', data: './travaux.geojson' });
+      map.addSource('src-travaux', { type: 'geojson', data: './travaux.geojson?t=' + Date.now() });
 
       // 2a. Polygones (Remplissage)
       map.addLayer({
         id: 'layer-travaux-fill',
         type: 'fill',
         source: 'src-travaux',
-        filter: ['==', '$type', 'Polygon'],
         layout: { 'visibility': 'visible' },
         paint: {
           'fill-color': [
@@ -695,7 +741,6 @@
         id: 'layer-travaux-line',
         type: 'line',
         source: 'src-travaux',
-        filter: ['in', '$type', 'Polygon', 'LineString'],
         layout: { 'visibility': 'visible' },
         paint: {
           'line-color': [
@@ -713,7 +758,6 @@
         id: 'layer-travaux-point',
         type: 'circle',
         source: 'src-travaux',
-        filter: ['==', '$type', 'Point'],
         layout: { 'visibility': 'visible' },
         paint: {
           'circle-radius': 8,
@@ -727,6 +771,12 @@
           'circle-stroke-color': '#ffffff'
         }
       });
+
+      // Appliquer le filtre initial (actifs cochés, passés décochés)
+      updateTravauxFilters();
+
+      document.getElementById('filter-travaux-actifs').addEventListener('change', updateTravauxFilters);
+      document.getElementById('filter-travaux-passes').addEventListener('change', updateTravauxFilters);
 
       // 3. Places PMR
       map.addSource('src-pmr', { type: 'geojson', data: './places_pmr.geojson' });
@@ -760,18 +810,6 @@
 
       setupLayerToggle('layer-pmr');
       setupLayerToggle('layer-livraison');
-
-      // Case à cocher pour l'ensemble des calques Travaux
-      const travauxCheckbox = document.getElementById('layer-travaux');
-      if (travauxCheckbox) {
-        travauxCheckbox.checked = true;
-        travauxCheckbox.addEventListener('change', (e) => {
-          const vis = e.target.checked ? 'visible' : 'none';
-          map.setLayoutProperty('layer-travaux-fill', 'visibility', vis);
-          map.setLayoutProperty('layer-travaux-line', 'visibility', vis);
-          map.setLayoutProperty('layer-travaux-point', 'visibility', vis);
-        });
-      }
     });
 
     // Orthophoto + slider d'opacité
